@@ -93,12 +93,46 @@ tbl_rainfall <- bind_rows(tbl_rainfall_1, tbl_rainfall_2, tbl_rainfall_3)
 
 
 
+# data - yield ------------------------------------------------------------
+
+# extract worksheet names
+yield_sheets <- excel_sheets(path = "rice_yield_1981_2016.xlsx")
+
+
+# import yield data 
+tbl_yield <- read_excel(path = "rice_yield_1981_2016.xlsx",
+                        sheet = yield_sheets[1], 
+                        na = c("", "-"),
+                        skip = 1, 
+                        n_max = 36
+)
+
+
+# reformat sheet 1, 2 and 3 data
+tbl_yield <- tbl_yield %>%
+    rename(Farming_Area = `Farming area`) %>%
+    rename(Harvested_Area = `Harvested area`) %>%
+    rename(Yield_per_Rai = `Yield per Rai (kg)`) %>%
+    select(Year, Farming_Area, Harvested_Area, Yield_per_Rai)
+
+
+
+# data - full  ------------------------------------------------------------
+
+# combine temperature, humidity, precipitation and yield
+tbl_data <- tbl_temp %>%
+    left_join(tbl_humidity, by = Date) %>%
+    left_join(tbl_rainfall, by = Date) %>%
+    left_join(tbl_yield, by = Date)
+
+
+
 # exploratory analysis ----------------------------------------------------
 
 plot(tbl_temp)
 plot(tbl_humidity)
 plot(tbl_rainfall)
-
+plot(tbl_yield)
 
 
 # statistical inference ---------------------------------------------------
