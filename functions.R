@@ -6,7 +6,7 @@
 read_my_data <- function(my_string, my_sheet, my_n) {
     read_excel(path = my_string,
                sheet = my_sheet, 
-               na = c("", "-"),
+               na = c("", "-", "T"),
                skip = 2, 
                n_max = my_n
     )

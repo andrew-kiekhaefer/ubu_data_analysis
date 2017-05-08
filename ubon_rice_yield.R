@@ -16,7 +16,6 @@ library(stringr)
 
 
 
-
 # functions ---------------------------------------------------------------
 
 source(file = "functions.R")
@@ -98,7 +97,6 @@ tbl_rainfall <- bind_rows(tbl_rainfall_1, tbl_rainfall_2, tbl_rainfall_3)
 # extract worksheet names
 yield_sheets <- excel_sheets(path = "rice_yield_1981_2016.xlsx")
 
-
 # import yield data 
 tbl_yield <- read_excel(path = "rice_yield_1981_2016.xlsx",
                         sheet = yield_sheets[1], 
@@ -106,7 +104,6 @@ tbl_yield <- read_excel(path = "rice_yield_1981_2016.xlsx",
                         skip = 1, 
                         n_max = 36
 )
-
 
 # reformat sheet 1, 2 and 3 data
 tbl_yield <- tbl_yield %>%
@@ -121,9 +118,9 @@ tbl_yield <- tbl_yield %>%
 
 # combine temperature, humidity, precipitation and yield
 tbl_data <- tbl_temp %>%
-    left_join(tbl_humidity, by = Date) %>%
-    left_join(tbl_rainfall, by = Date) %>%
-    left_join(tbl_yield, by = Date)
+    left_join(tbl_humidity, by = "Date") %>%
+    left_join(tbl_rainfall, by = "Date") #%>%
+    #left_join(tbl_yield, by = Date)
 
 
 
@@ -133,6 +130,7 @@ plot(tbl_temp)
 plot(tbl_humidity)
 plot(tbl_rainfall)
 plot(tbl_yield)
+
 
 
 # statistical inference ---------------------------------------------------
