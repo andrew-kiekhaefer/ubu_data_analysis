@@ -24,7 +24,7 @@ reformat_temp_data <- function(x) {
         mutate(Year = year(Month_Year)) %>% # create Year field
         mutate(Date = as.Date(paste(Year, Month, Day, sep = "-"))) %>% # create Date field
         filter(!is.na(Date)) %>% # remove all Dates having NA value
-        select(Date, Temperature) # select columns "Date" and "Temperature" only
+        select(Date, Day, Month, Year, Temperature) # select columns "Date" and "Temperature" only
 }
 
 # reformat humidity data
@@ -59,14 +59,3 @@ reformat_precip_data <- function(x) {
 }
 
 
-# reformat yield data
-reformat_yield_data <- function(x) {
-    x %>%
-        rename(Month_Year = `Month/Year`) %>% # rename "Month/Year" to "Month_Year"
-        select(-No, -Station, -Total) %>% # remove column "No", "Station" and "X__1" from tbl_temp
-        gather(Day, Precipitation, -Month_Year) %>% # gather all day columns into "Day" and "Temperature" columns
-        mutate(Day = str_trim(Day)) %>% # remove character white space from Day column
-        mutate(Day = as.numeric(Day)) %>% # convert Day column to numeric from character
-        mutate(Date = ymd(Month_Year) + (Day - 1)) %>% # create Date column from Month_Year and Day
-        select(Date, Precipitation) # select columns "Date" and "Temperature" only
-}

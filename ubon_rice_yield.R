@@ -131,12 +131,39 @@ plot(tbl_rainfall)
 plot(tbl_yield)
 
 
+tbl_yearly <- tbl_data %>%
+    filter(Month > 4, Month < 11) %>%
+    group_by(Year) %>%
+    summarize(avg_temp = mean(Temperature), avg_humi = mean(Humidity), avg_rain = mean(Precipitation)) %>%
+    left_join(tbl_yield, by = "Year") %>%
+    select(-Farming_Area, -Harvested_Area)
+
+
+
+
+tbl_monthly <- tbl_data %>%
+    filter(Month > 4, Month < 11) %>%
+    group_by(Year, Month) %>%
+    summarize(avg_temp = mean(Temperature), avg_humi = mean(Humidity), avg_rain = mean(Precipitation)) %>%
+    mutate(month_temp = paste("temp", Month, sep = "_")) %>%
+    mutate(month_humi = paste("humi", Month, sep = "_")) %>%
+    mutate(month_rain = paste("rain", Month, sep = "_")) %>%
+    select(-Month) %>%
+    ungroup() %>%
+    spread(month_temp, avg_temp) %>%
+    spread(month_rain, avg_rain) %>%
+    spread(month_humi, avg_humi) %>%
+    group_by(Year) %>%
+    summarize_each(funs(sum( ., na.rm = TRUE))) %>%
+    left_join(tbl_yield, by = "Year")
+
+
 
 # statistical inference ---------------------------------------------------
 
+monthly_fit <- lm(Yield_per_Rai ~ ., data = tbl_monthly)
 
-
-
+yearly_fit <- lm(Yield_per_Rai ~ Year, data = tbl_yearly)
 
 
 # predictive modeling -----------------------------------------------------
