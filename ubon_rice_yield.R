@@ -102,8 +102,7 @@ tbl_yield <- read_excel(path = "rice_yield_1981_2016.xlsx",
                         sheet = yield_sheets[1], 
                         na = c("", "-"),
                         skip = 1, 
-                        n_max = 36
-)
+                        n_max = 36)
 
 # reformat sheet 1, 2 and 3 data
 tbl_yield <- tbl_yield %>%
