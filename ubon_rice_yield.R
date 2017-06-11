@@ -177,7 +177,7 @@ tbl_yearly <- tbl_data %>%
 
 
 tbl_monthly <- tbl_data %>%
-    filter(Month > 4, Month < 11) %>%
+#    filter(Month > 4, Month < 11) %>%
     group_by(Year, Month) %>%
     summarize(avg_temp = mean(Temperature), avg_humi = mean(Humidity), accu_rain = sum(Precipitation, na.rm = TRUE)) %>%
     mutate(month_temp = paste("temp", Month, sep = "_")) %>%
@@ -195,6 +195,70 @@ tbl_monthly <- tbl_data %>%
     left_join(tbl_yield_cassava, by = c("Year" = "year"))
 
 
+
+# summary -----------------------------------------------------------------
+
+# summary statistics grouped by YEAR, MONTH
+tbl_data %>%
+    group_by(Year, Month) %>%
+    summarize(avg_temp = mean(Temperature), std_temp = sd(Temperature), max_temp = max(Temperature), min_temp = min(Temperature),
+              avg_humi = mean(Humidity), std_humi = sd(Humidity), max_humi = max(Humidity), min_humi = min(Humidity),
+              avg_rain = mean(Precipitation, na.rm = TRUE), std_rain = sd(Precipitation, na.rm = TRUE), 
+                max_rain = max(Precipitation, na.rm = TRUE), min_rain = min(Precipitation, na.rm = TRUE))
+
+# summary statistics grouped by MONTH
+tbl_monthly_30yr_th <- tbl_data %>%
+    select(-Precipitation, -Date, -Day) %>%
+    group_by(Year, Month) %>%
+    summarize_each(funs(mean( ., na.rm = TRUE))) %>%
+    ungroup() %>%
+    mutate(Month = as.factor(Month))
+
+tbl_monthly_30yr <- tbl_data %>%
+    select(-Temperature, -Humidity, -Date, - Day) %>%
+    group_by(Year, Month) %>%
+    summarize_each(funs(sum( ., na.rm = TRUE))) %>%
+    ungroup() %>%
+    mutate(Month = as.factor(Month)) %>%
+    left_join(tbl_monthly_30yr_th, by = c("Year", "Month")) %>%
+    mutate(Year = as.factor(Year))
+
+
+
+# boxplots ----------------------------------------------------------------
+
+# monthly average Temperature over 30 years
+ggplot(data = tbl_monthly_30yr, aes(x = Month, y = Temperature)) +
+    geom_boxplot() 
+
+# monthly average Humidity over 30 years
+ggplot(data = tbl_monthly_30yr, aes(x = Month, y = Humidity)) +
+    geom_boxplot()
+
+# monthly average Precipitation over 30 years
+ggplot(data = tbl_monthly_30yr, aes(x = Month, y = Precipitation)) +
+    geom_boxplot()
+
+
+
+# scatterplots ------------------------------------------------------------
+
+# monthly average Temperature trend over 30 years
+ggplot(data = tbl_monthly_30yr, aes(x = Month, y = Temperature, group = Year, colour = Year)) +
+    geom_point() +
+    geom_line()
+
+# monthly average Humidity trend over 30 years
+ggplot(data = tbl_monthly_30yr, aes(x = Month, y = Humidity, group = Year, colour = Year)) +
+    geom_point() +
+    geom_line()
+
+# monthly average Precipitation trend over 30 years
+ggplot(data = tbl_monthly_30yr, aes(x = Month, y = Precipitation, group = Year, colour = Year)) +
+    geom_point() +
+    geom_line()
+
+
 # statistical inference ---------------------------------------------------
 
 monthly_fit_rice <- lm(yield_per_rai_rice ~ ., data = tbl_monthly)
@@ -204,6 +268,7 @@ yearly_fit_rice <- lm(yield_per_rai_rice ~ Year, data = tbl_yearly)
 yearly_fit_rice <- lm(yield_per_rai_rice ~ ., data = tbl_yearly)
 
 yearly_fit_rice <- lm(yield_per_rai_rice ~ Year + avg_humi + accu_rain, data = tbl_yearly)
+
 
 # predictive modeling -----------------------------------------------------
 
